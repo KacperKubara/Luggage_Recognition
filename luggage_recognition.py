@@ -10,5 +10,5 @@ if __name__ == "__main__":
     parser.add_argument('--output_path',
                         help="Relative path to the output image for the Luggage Recognition")
     args = parser.parse_args()
-    luggageRecogniser0 = Luggage_Recogniser()
+    luggageRecogniser = Luggage_Recogniser()
     

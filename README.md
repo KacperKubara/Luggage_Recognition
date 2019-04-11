@@ -13,6 +13,7 @@ None :(
     * Load image 
     * If luggage with the owner detected return 1
     * If luggage without the owner detecter return 0
+    * Luggage is considered as: backpack, suitcase and handbag
 2) Distance between luggage and owner is computed
 3) Algorithm to determine if the luggage is unattended
 4) Add alerts on the picture if unattended luggage is detected
