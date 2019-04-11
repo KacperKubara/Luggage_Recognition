@@ -3,7 +3,7 @@ Project to recognise unattended luggage in public spaces.
 ## Project Structure
 * test_data  -> test images with luggage which unattended and attended
 * train_data -> train dataset with images of different luggage and people(not currently implemented)
-* luggage_recognition.py -> main script using luggage detection algorithm
+* luggage_recognition.py -> main script demonstrating the functionality
 * luggage_recogniser.py  -> class implementing the luggage detection algorithm
 * utils.py -> helper function to help maintaining a clear code
 ## Current Functionality
