@@ -22,10 +22,21 @@ class Luggage_Recogniser:
 
     def is_attended(self):
         #Algorithm here
-        pass
+        box_person = [0, 0, 0, 0]
+        box_luggage = [0, 0, 0, 0]
+        classIDs, confidences, boxes = self.detect_objects()
+        for i in classIDs:
+            if "person" in self.labels[classIDs[i]]:
+                if box_person[2] + box_person[3] < boxes[2] + boxes[3]:
+                    box_person =  boxes[i]
+            if self.labels[classIDs[i]] in self.luggage_labels:
+                if box_luggage[2] + box_luggage[3] < boxes[2] + boxes[3]:
+                    box_luggage =  boxes[i]
+
 
 # Return the detected object's labels with their coordinates
     def detect_objects(self):
+        
         self.getLayerNames()
         self.imagePreprocessing()
         self.predict()
@@ -35,9 +46,11 @@ class Luggage_Recogniser:
         .format(classIDs, confidences, boxes, idxs))
         self.labelFigures(classIDs, confidences, boxes, idxs)
         
-        classIDs, confidences, boxes = self.non_overlapping_figures(classIDs, confidences, boxes, idxs)
-        
+        classIDs, confidences, boxes = self.non_overlapping_figures(classIDs, confidences,
+                                                                    boxes, idxs)
         self.show_picture() 
+
+        return classIDs, confidences, boxes
 
     def getLayerNames(self):
         # Get the output layer names
