@@ -34,6 +34,9 @@ class Luggage_Recogniser:
         print("ClassID: {} Confidences: {} Boxes: {} Idxs: {}"
         .format(classIDs, confidences, boxes, idxs))
         self.labelFigures(classIDs, confidences, boxes, idxs)
+        
+        classIDs, confidences, boxes = self.non_overlapping_figures(classIDs, confidences, boxes, idxs)
+        
         self.show_picture() 
 
     def getLayerNames(self):
@@ -78,11 +81,10 @@ class Luggage_Recogniser:
                     classIDs.append(classID)
                     idxs = cv2.dnn.NMSBoxes(boxes, confidences, self.confidence,
 	    	        self.threshold)
-        print(idxs)
         return (classIDs, confidences, boxes, idxs)
     
     def labelFigures(self, classIDs, confidences, boxes, idxs):
-        # Label figures and delte overlapping frames
+        # Label figures and delete overlapping frames
         if len(idxs) > 0:
             for i in idxs.flatten():
                 (x, y) = (boxes[i][0], boxes[i][1])
@@ -94,6 +96,19 @@ class Luggage_Recogniser:
                 cv2.putText(self.image, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX,
                     0.5, color, 2)
                 
+    def non_overlapping_figures(self, classIDs, confidences, boxes, idxs):
+        idxs = idxs.flatten()
+        idxs = np.sort(idxs)
+        print("Idxs again: {}".format(idxs))
+
+        classIDs = [classIDs[i] for i in idxs]
+        confidences = [confidences[i] for i in idxs]
+        boxes = [boxes[i] for i in idxs]
+        print("ClassIDs Filtered: {}".format(classIDs))
+        print("Confidences Filtered: {}".format(confidences))
+        print("Boxes Filtered: {}".format(boxes))
+
+        return classIDs, confidences, boxes
 
     def show_picture(self):
         # Show the image
