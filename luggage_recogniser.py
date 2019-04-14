@@ -30,22 +30,11 @@ class Luggage_Recogniser:
         self.imagePreprocessing()
         self.predict()
 
-        classIDs, confidences, boxes = self.filterFigures()
-
-        # Label figures
-        idxs = cv2.dnn.NMSBoxes(boxes, confidences, self.confidence,
-	    	self.threshold)
-        if len(idxs) > 0:
-            for i in idxs.flatten():
-                (x, y) = (boxes[i][0], boxes[i][1])
-                (w, h) = (boxes[i][2], boxes[i][3])
-
-                color = [0]
-                cv2.rectangle(self.image, (x, y), (x + w, y + h), color, 2)
-                text = "{}: {:.4f}".format(self.labels[classIDs[i]], confidences[i])
-                cv2.putText(self.image, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX,
-                    0.5, color, 2)
-        self.show_picture()
+        classIDs, confidences, boxes, idxs = self.filterFigures()
+        print("ClassID: {} Confidences: {} Boxes: {} Idxs: {}"
+        .format(classIDs, confidences, boxes, idxs))
+        self.labelFigures(classIDs, confidences, boxes, idxs)
+        self.show_picture() 
 
     def getLayerNames(self):
         # Get the output layer names
@@ -87,11 +76,26 @@ class Luggage_Recogniser:
                     boxes.append([x, y, int(width), int(height)])
                     confidences.append(float(confidence))
                     classIDs.append(classID)
-        return (classIDs, confidences, boxes)
+                    idxs = cv2.dnn.NMSBoxes(boxes, confidences, self.confidence,
+	    	        self.threshold)
+        print(idxs)
+        return (classIDs, confidences, boxes, idxs)
     
-    def labelFigures(self):
-        pass
+    def labelFigures(self, classIDs, confidences, boxes, idxs):
+        # Label figures and delte overlapping frames
+        if len(idxs) > 0:
+            for i in idxs.flatten():
+                (x, y) = (boxes[i][0], boxes[i][1])
+                (w, h) = (boxes[i][2], boxes[i][3])
+
+                color = [0]
+                cv2.rectangle(self.image, (x, y), (x + w, y + h), color, 2)
+                text = "{}: {:.4f}".format(self.labels[classIDs[i]], confidences[i])
+                cv2.putText(self.image, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5, color, 2)
+                
 
     def show_picture(self):
+        # Show the image
         cv2.imshow("image", self.image)
         cv2.waitKey(0)
