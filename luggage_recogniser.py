@@ -25,13 +25,20 @@ class Luggage_Recogniser:
         box_person = [0, 0, 0, 0]
         box_luggage = [0, 0, 0, 0]
         classIDs, confidences, boxes = self.detect_objects()
-        for i in classIDs:
+        for i in range(0, len(classIDs)):
             if "person" in self.labels[classIDs[i]]:
-                if box_person[2] + box_person[3] < boxes[2] + boxes[3]:
+                if box_person[2] + box_person[3] < boxes[i][2] + boxes[i][3]:
                     box_person =  boxes[i]
             if self.labels[classIDs[i]] in self.luggage_labels:
-                if box_luggage[2] + box_luggage[3] < boxes[2] + boxes[3]:
+                if box_luggage[2] + box_luggage[3] < boxes[i][2] + boxes[i][3]:
                     box_luggage =  boxes[i]
+        print("Box Person: {} Box Luggage: {}".format(box_person, box_luggage))
+        x0 = box_person[0] + int(box_person[2]/2)
+        y0 = box_person[1] + int(box_person[3]/2)
+        
+        x1 = box_luggage[0] + int(box_luggage[2]/2)
+        y1 = box_luggage[1] + int(box_luggage[3]/2)
+        cv2.line(self.image,(x0, y0), (x1, y1), (255, 0, 0), 5)
 
 
 # Return the detected object's labels with their coordinates
@@ -48,7 +55,6 @@ class Luggage_Recogniser:
         
         classIDs, confidences, boxes = self.non_overlapping_figures(classIDs, confidences,
                                                                     boxes, idxs)
-        self.show_picture() 
 
         return classIDs, confidences, boxes
 
@@ -60,6 +66,7 @@ class Luggage_Recogniser:
     def imagePreprocessing(self):
         # Preprocess image
         (self.H, self.W) = self.image.shape[:2]
+        print("Self.H {} Self.W {}".format(self.H, self.W))
         self.blob = cv2.dnn.blobFromImage(self.image, 1 / 255.0, (416, 416),
             swapRB=True, crop=False)
     
