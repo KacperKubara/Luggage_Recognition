@@ -39,6 +39,14 @@ class Luggage_Recogniser:
         x1 = box_luggage[0] + int(box_luggage[2]/2)
         y1 = box_luggage[1] + int(box_luggage[3]/2)
         cv2.line(self.image,(x0, y0), (x1, y1), (255, 0, 0), 5)
+        x0_conv, y0_conv = utils.distance_converter(box_person[3], 1.8, x0, y0)
+        x1_conv, y1_conv = utils.distance_converter(box_luggage[3], 0.5, x1, y1)
+        distance = ((x1_conv - x0_conv)**2 + (y1_conv - y0_conv)**2)**0.5
+        
+        (mX, mY) = ((x0+x1)/2, (y0+y1)/2)
+        mX = int(mX)
+        mY = int(mY)
+        cv2.putText(self.image, "Distance: {:.2f}m".format(distance), (mX, mY - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, [0], 2)
 
 
 # Return the detected object's labels with their coordinates

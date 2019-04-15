@@ -13,3 +13,10 @@ def load_yolo(relative_path = "./yolo-detector"):
 
     print("[INFO] Loading YOLO from disk...")
     return cv2.dnn.readNetFromDarknet(configPath, weightsPath)
+
+def distance_converter(image_dist, real_dist, *args):
+    result = []
+    conversion_rate = real_dist/float(image_dist)
+    for arg in args:
+        result.append(arg*conversion_rate)
+    return tuple(result)
