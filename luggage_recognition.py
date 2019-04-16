@@ -16,7 +16,7 @@ if __name__ == "__main__":
     luggageRecogniser.draw_line()
     luggageRecogniser.show_picture()
     
-    luggageRecogniser.set_picture()
+    luggageRecogniser.set_picture(make_photo="yes")
     luggageRecogniser.is_attended()
     luggageRecogniser.draw_line()
     luggageRecogniser.show_picture()

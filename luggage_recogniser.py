@@ -7,6 +7,7 @@ from object_recogniser import ObjectRecogniser
 class LuggageRecogniser:
     def __init__(self, image_path = "test_data/luggage1.jpeg", confidence = 0.5, threshold = 0.4):
         self.objRecogniser = ObjectRecogniser(image_path, confidence, threshold)
+        self.camera = cv2.VideoCapture(0)
 
     def is_attended(self):
         # If luggage is attended returns true, false otherwise
@@ -48,11 +49,12 @@ class LuggageRecogniser:
         return (x0, y0, x1, y1)
 
     def draw_line(self):
-        x0, y0, x1, y1 = self.center_cords_all()
-        (mX, mY) = (int((x0+x1)/2), int((y0+y1)/2))
-        cv2.line(self.objRecogniser.image,(x0, y0), (x1, y1), (255, 0, 0), 2)
-        cv2.putText(self.objRecogniser.image, "Distance > {:.2f}m".format(self.distance),
-                    (mX, mY + 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, [200, 0, 0], 2)    
+        if self.box_person[2] != 0 and self.box_luggage[2] != 0:
+            x0, y0, x1, y1 = self.center_cords_all()
+            (mX, mY) = (int((x0+x1)/2), int((y0+y1)/2))
+            cv2.line(self.objRecogniser.image,(x0, y0), (x1, y1), (255, 0, 0), 2)
+            cv2.putText(self.objRecogniser.image, "Distance > {:.2f}m".format(self.distance),
+                        (mX, mY + 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, [200, 0, 0], 2)    
     
     def show_picture(self):
         self.objRecogniser.show_picture()
@@ -62,4 +64,6 @@ class LuggageRecogniser:
             self.objRecogniser.image_path = image_path
             self.objRecogniser.image = utils.load_image(image_path)
         if make_photo == "yes":
-            pass # Implement functionality here
+            ret, image_camera = self.camera.read()
+            self.camera.release()
+            self.objRecogniser.image = image_camera
