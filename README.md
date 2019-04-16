@@ -7,7 +7,7 @@ Project to recognise unattended luggage in public spaces.
 * luggage_recogniser.py  -> class implementing the luggage detection algorithm
 * utils.py -> helper function to help maintaining a clear code
 ## Current Functionality
-* Objective 3)
+* Objective 5) but Objective 4) not implemented
 ## Development objectives
 1) Luggage and owner correctly detected:
     * Load image 
