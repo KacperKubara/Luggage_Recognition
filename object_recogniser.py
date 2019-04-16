@@ -40,7 +40,6 @@ class ObjectRecogniser:
     def imagePreprocessing(self):
         # Preprocess image
         (self.H, self.W) = self.image.shape[:2]
-        print("Self.H {} Self.W {}".format(self.H, self.W))
         self.blob = cv2.dnn.blobFromImage(self.image, 1 / 255.0, (416, 416),
             swapRB=True, crop=False)
     
@@ -50,7 +49,7 @@ class ObjectRecogniser:
         start = time.time()
         self.layerOutputs = self.net.forward(self.ln)
         end = time.time()     
-        print("Process took {:.6f} seconds".format(end-start)) 
+        print("[INFO] Processing image took {:.6f} seconds".format(end-start)) 
     
     def filterFigures(self):
         # Filter figures
@@ -84,23 +83,26 @@ class ObjectRecogniser:
                 (x, y) = (boxes[i][0], boxes[i][1])
                 (w, h) = (boxes[i][2], boxes[i][3])
 
-                color = [0]
+                color = self.pick_color(classIDs[i])
                 cv2.rectangle(self.image, (x, y), (x + w, y + h), color, 2)
                 text = "{}: {:.4f}".format(self.labels[classIDs[i]], confidences[i])
                 cv2.putText(self.image, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX,
                     0.5, color, 2)
-                
+    def pick_color(self, classIDs):
+        if self.labels[classIDs] in self.luggage_labels:
+            return [0, 255, 255]
+        if self.labels[classIDs] == "person":
+            return [150, 0, 255]
+        else:
+            return [0]
+
     def non_overlapping_figures(self, classIDs, confidences, boxes, idxs):
         idxs = idxs.flatten()
         idxs = np.sort(idxs)
-        print("Idxs again: {}".format(idxs))
 
         classIDs = [classIDs[i] for i in idxs]
         confidences = [confidences[i] for i in idxs]
         boxes = [boxes[i] for i in idxs]
-        print("ClassIDs Filtered: {}".format(classIDs))
-        print("Confidences Filtered: {}".format(confidences))
-        print("Boxes Filtered: {}".format(boxes))
 
         return classIDs, confidences, boxes
 

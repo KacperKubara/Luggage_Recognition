@@ -25,10 +25,8 @@ def euclidan_dist(*args):
     # Computes euclidan distance of pairs of coordinates 
     result = 0
     if len(args) % 2 != 0:
-        return 0
-        
+        return 0        
     for i in range(0, len(args), 2):
-        print(i)
         result += (args[i] - args[i+1])**2
     return result ** 0.5
 
