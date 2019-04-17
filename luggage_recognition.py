@@ -15,10 +15,10 @@ if __name__ == "__main__":
     luggageRecogniser = LuggageRecogniser()
     print(luggageRecogniser.is_attended())
     luggageRecogniser.draw_line()
-    luggageRecogniser.show_picture()
+    luggageRecogniser.show_picture(alert = True)
     
     # Second functionality test: make photo, alert when unattended
-    luggageRecogniser.set_picture(make_photo="yes")
+    luggageRecogniser.set_picture(make_photo="no")
     is_attended = luggageRecogniser.is_attended()
     luggageRecogniser.draw_line()
     if is_attended == False:

@@ -26,11 +26,9 @@ class ObjectRecogniser:
         self.getLayerNames()
         self.imagePreprocessing()
         self.predict()
-        classIDs, confidences, boxes, idxs = self.filterFigures()
-        self.labelFigures(classIDs, confidences, boxes, idxs)
-        classIDs, confidences, boxes = self.non_overlapping_figures(classIDs, confidences,
-                                                                    boxes, idxs)
-        return classIDs, confidences, boxes
+        self.filterFigures()
+        self.non_overlapping_figures()
+        return self.classIDs, self.confidences, self.boxes
 
     def getLayerNames(self):
         # Get the output layer names
@@ -53,9 +51,9 @@ class ObjectRecogniser:
     
     def filterFigures(self):
         # Filter figures
-        boxes = []
-        confidences = []
-        classIDs = []
+        self.boxes = []
+        self.confidences = []
+        self.classIDs = []
         for output in self.layerOutputs:
             for detection in output:
                 scores = detection[5:]
@@ -69,44 +67,51 @@ class ObjectRecogniser:
                     x = int(centerX - (width / 2))
                     y = int(centerY - (height / 2))
 
-                    boxes.append([x, y, int(width), int(height)])
-                    confidences.append(float(confidence))
-                    classIDs.append(classID)
-                    idxs = cv2.dnn.NMSBoxes(boxes, confidences, self.confidence,
-	    	        self.threshold)
-        return (classIDs, confidences, boxes, idxs)
-    
-    def labelFigures(self, classIDs, confidences, boxes, idxs):
-        # Label figures and delete overlapping frames
-        if len(idxs) > 0:
-            for i in idxs.flatten():
-                (x, y) = (boxes[i][0], boxes[i][1])
-                (w, h) = (boxes[i][2], boxes[i][3])
+                    self.boxes.append([x, y, int(width), int(height)])
+                    self.confidences.append(float(confidence))
+                    self.classIDs.append(classID)
+                    self.idxs = cv2.dnn.NMSBoxes(self.boxes, self.confidences, self.confidence, self.threshold)
 
-                color = self.pick_color(classIDs[i])
+    
+    def labelFigures(self, alert = False):
+        # Label figures and draw the frame
+        if len(self.idxs) > 0:
+            for i in self.idxs.flatten():
+                (x, y) = (self.boxes[i][0], self.boxes[i][1])
+                (w, h) = (self.boxes[i][2], self.boxes[i][3])
+
+                if alert == True and self.labels[self.classIDs[i]] in self.luggage_labels:
+                    color = [0, 0, 255]    
+                    cv2.putText(self.image, "Alert! Luggage Unattended", (x, y - 20), cv2.FONT_HERSHEY_SIMPLEX,
+                                0.5, color, 2)
+                else:
+                    color = self.pick_color(index = self.classIDs[i])
+
+                text = "{}: {:.4f}".format(self.labels[self.classIDs[i]], self.confidences[i])
                 cv2.rectangle(self.image, (x, y), (x + w, y + h), color, 2)
-                text = "{}: {:.4f}".format(self.labels[classIDs[i]], confidences[i])
                 cv2.putText(self.image, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX,
                     0.5, color, 2)
-    def pick_color(self, classIDs):
-        if self.labels[classIDs] in self.luggage_labels:
+
+    def pick_color(self, index):
+        if self.labels[index] in self.luggage_labels:
             return [0, 255, 255]
-        if self.labels[classIDs] == "person":
+        if self.labels[index] == "person":
             return [150, 0, 255]
         else:
             return [0]
 
-    def non_overlapping_figures(self, classIDs, confidences, boxes, idxs):
-        idxs = idxs.flatten()
-        idxs = np.sort(idxs)
+    def non_overlapping_figures(self):
+        self.idxs = self.idxs.flatten()
+        self.idxs = np.sort(self.idxs)
 
-        classIDs = [classIDs[i] for i in idxs]
-        confidences = [confidences[i] for i in idxs]
-        boxes = [boxes[i] for i in idxs]
+        self.classIDs = [self.classIDs[i] for i in self.idxs]
+        self.confidences = [self.confidences[i] for i in self.idxs]
+        self.boxes = [self.boxes[i] for i in self.idxs]
 
-        return classIDs, confidences, boxes
+        return self.classIDs, self.confidences, self.boxes
 
-    def show_picture(self):
+    def show_picture(self, alert = False):
         # Show the image
+        self.labelFigures(alert)
         cv2.imshow("image", self.image)
         cv2.waitKey(0)

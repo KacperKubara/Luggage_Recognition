@@ -56,8 +56,8 @@ class LuggageRecogniser:
             cv2.putText(self.objRecogniser.image, "Distance > {:.2f}m".format(self.distance),
                         (mX, mY + 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, [200, 0, 0], 2)    
     
-    def show_picture(self):
-        self.objRecogniser.show_picture()
+    def show_picture(self, alert = False):
+        self.objRecogniser.show_picture(alert)
     
     def set_picture(self, make_photo = "no", image_path = "test_data/luggage2.jpeg"):
         if make_photo == "no":
