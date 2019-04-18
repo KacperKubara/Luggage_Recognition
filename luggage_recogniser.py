@@ -5,7 +5,7 @@ import numpy as np
 from object_recogniser import ObjectRecogniser
 
 class LuggageRecogniser:
-    def __init__(self, image_path = "test_data/luggage1.jpeg", confidence = 0.5, threshold = 0.4):
+    def __init__(self, image_path = "test_data/luggage1.jpeg", video_path = "None" confidence = 0.5, threshold = 0.4):
         self.objRecogniser = ObjectRecogniser(image_path, confidence, threshold)
         self.camera = cv2.VideoCapture(0)
 
@@ -67,3 +67,12 @@ class LuggageRecogniser:
             ret, image_camera = self.camera.read()
             self.camera.release()
             self.objRecogniser.image = image_camera
+    
+    def set_video(self, video_path = ""):
+        if video_path != "":
+            while True:
+                vstream = cv2.VideoCapture(video_path)
+                (grabbed, image) = vstream.read()
+                if grabbed is None:
+                    break
+                
