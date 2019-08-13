@@ -1,7 +1,9 @@
-import cv2
-import utils
 import time 
+
+import cv2
 import numpy as np
+
+import utils
 
 class ObjectRecogniser:
     def __init__(self, image_path, confidence, threshold):
@@ -22,12 +24,12 @@ class ObjectRecogniser:
         
 # Return the detected object's labels with their coordinates
     def detect_objects(self):
-        
         self.getLayerNames()
         self.imagePreprocessing()
         self.predict()
         self.filterFigures()
         self.non_overlapping_figures()
+
         return self.classIDs, self.confidences, self.boxes
 
     def getLayerNames(self):
@@ -110,7 +112,7 @@ class ObjectRecogniser:
 
         return self.classIDs, self.confidences, self.boxes
 
-    def show_picture(self, alert = False):
+    def show_picture_obj(self, alert = False):
         # Show the image
         self.labelFigures(alert)
         cv2.imshow("image", self.image)

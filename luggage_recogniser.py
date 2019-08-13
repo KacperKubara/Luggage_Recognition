@@ -1,17 +1,19 @@
-import cv2
-import utils
 import time 
+import utils
+
+import cv2
 import numpy as np
+
 from object_recogniser import ObjectRecogniser
 
-class LuggageRecogniser:
-    def __init__(self, image_path = "test_data/luggage1.jpeg", video_path = "None" confidence = 0.5, threshold = 0.4):
-        self.objRecogniser = ObjectRecogniser(image_path, confidence, threshold)
+class LuggageRecogniser(ObjectRecogniser):
+    def __init__(self, image_path = "test_data/luggage1.jpeg", video_path = "None", confidence = 0.5, threshold = 0.4):
+        super().__init__(image_path, confidence, threshold)
         self.camera = cv2.VideoCapture(0)
 
     def is_attended(self):
         # If luggage is attended returns true, false otherwise
-        classIDs, confidences, boxes = self.objRecogniser.detect_objects()
+        classIDs, confidences, boxes = super().detect_objects()
         self.filterBoxes(classIDs, boxes)
         # box[3] == 0 if it doesn't exist 
         if self.box_person[3] == 0 and self.box_luggage[3] != 0:
@@ -34,10 +36,10 @@ class LuggageRecogniser:
         self.box_luggage = [0, 0, 0, 0]
         self.box_person = [0, 0, 0, 0]
         for i in range(0, len(classIDs)):
-            if "person" in self.objRecogniser.labels[classIDs[i]]:
+            if "person" in self.labels[classIDs[i]]:
                 if self.box_person[2] + self.box_person[3] < boxes[i][2] + boxes[i][3]:
                     self.box_person =  boxes[i]
-            if self.objRecogniser.labels[classIDs[i]] in self.objRecogniser.luggage_labels:
+            if self.labels[classIDs[i]] in self.luggage_labels:
                 if self.box_luggage[2] + self.box_luggage[3] < boxes[i][2] + boxes[i][3]:
                     self.box_luggage =  boxes[i]
 
@@ -52,21 +54,21 @@ class LuggageRecogniser:
         if self.box_person[2] != 0 and self.box_luggage[2] != 0:
             x0, y0, x1, y1 = self.center_cords_all()
             (mX, mY) = (int((x0+x1)/2), int((y0+y1)/2))
-            cv2.line(self.objRecogniser.image,(x0, y0), (x1, y1), (255, 0, 0), 2)
-            cv2.putText(self.objRecogniser.image, "Distance > {:.2f}m".format(self.distance),
+            cv2.line(self.image,(x0, y0), (x1, y1), (255, 0, 0), 2)
+            cv2.putText(self.image, "Distance > {:.2f}m".format(self.distance),
                         (mX, mY + 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, [200, 0, 0], 2)    
     
     def show_picture(self, alert = False):
-        self.objRecogniser.show_picture(alert)
+        super().show_picture_obj(alert)
     
     def set_picture(self, make_photo = "no", image_path = "test_data/luggage2.jpeg"):
         if make_photo == "no":
-            self.objRecogniser.image_path = image_path
-            self.objRecogniser.image = utils.load_image(image_path)
+            self.image_path = image_path
+            self.image = utils.load_image(image_path)
         if make_photo == "yes":
             ret, image_camera = self.camera.read()
             self.camera.release()
-            self.objRecogniser.image = image_camera
+            self.image = image_camera
     
     def set_video(self, video_path = ""):
         if video_path != "":

@@ -1,8 +1,10 @@
-import cv2
 import argparse
+
+import cv2
 
 from object_recogniser import ObjectRecogniser
 from luggage_recogniser import LuggageRecogniser
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Luggage Recognition Terminal")
     parser.add_argument('--input_path',
@@ -18,7 +20,7 @@ if __name__ == "__main__":
     luggageRecogniser.show_picture(alert = True)
     
     # Second functionality test: make photo, alert when unattended
-    luggageRecogniser.set_picture(make_photo="no")
+    luggageRecogniser.set_picture(make_photo="yes")
     is_attended = luggageRecogniser.is_attended()
     luggageRecogniser.draw_line()
     if is_attended == False:
