@@ -69,6 +69,15 @@ class LuggageRecogniser(ObjectRecogniser):
             ret, image_camera = self.camera.read()
             self.camera.release()
             self.image = image_camera
+            # ToDo: Fix issue with self.image=None
+            print(f"self.image: {self.image} ")
+            
+        is_attended = self.is_attended()
+        self.draw_line()
+        if is_attended:
+            self.show_picture(alert = False)
+        else: 
+            self.show_picture(alert = True)
     
     def set_video(self, video_path = ""):
         if video_path != "":

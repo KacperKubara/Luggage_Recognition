@@ -78,21 +78,28 @@ class ObjectRecogniser:
     def labelFigures(self, alert = False):
         # Label figures and draw the frame
         if len(self.idxs) > 0:
+            print(self.idxs)
+            print(self.boxes)
             for i in self.idxs.flatten():
-                (x, y) = (self.boxes[i][0], self.boxes[i][1])
-                (w, h) = (self.boxes[i][2], self.boxes[i][3])
+                print(i)
+                try:
+                    (x, y) = (self.boxes[i][0], self.boxes[i][1])
+                    (w, h) = (self.boxes[i][2], self.boxes[i][3])
+                
+                    if alert == True and self.labels[self.classIDs[i]] in self.luggage_labels:
+                        color = [0, 0, 255]    
+                        cv2.putText(self.image, "Alert! Luggage Unattended", (x, y - 20), cv2.FONT_HERSHEY_SIMPLEX,
+                                    0.5, color, 2)
+                    else:
+                        color = self.pick_color(index = self.classIDs[i])
 
-                if alert == True and self.labels[self.classIDs[i]] in self.luggage_labels:
-                    color = [0, 0, 255]    
-                    cv2.putText(self.image, "Alert! Luggage Unattended", (x, y - 20), cv2.FONT_HERSHEY_SIMPLEX,
-                                0.5, color, 2)
-                else:
-                    color = self.pick_color(index = self.classIDs[i])
-
-                text = "{}: {:.4f}".format(self.labels[self.classIDs[i]], self.confidences[i])
-                cv2.rectangle(self.image, (x, y), (x + w, y + h), color, 2)
-                cv2.putText(self.image, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX,
-                    0.5, color, 2)
+                    text = "{}: {:.4f}".format(self.labels[self.classIDs[i]], self.confidences[i])
+                    cv2.rectangle(self.image, (x, y), (x + w, y + h), color, 2)
+                    cv2.putText(self.image, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX,
+                        0.5, color, 2)
+                        
+                except IndexError:
+                    print(f"Accessing Non-existing box with index \"{i}\"")
 
     def pick_color(self, index):
         if self.labels[index] in self.luggage_labels:
